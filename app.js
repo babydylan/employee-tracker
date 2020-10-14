@@ -54,7 +54,7 @@ function start() {
           addEmp();
 					break;
 					
-        case "Remove Employee":
+        case "Add Department":
           addDep();
           break;
 
@@ -197,7 +197,27 @@ function addEmp() {
 }
 
 function addDep() {
-
+  return inquirer
+  .prompt({
+    name: "depName",
+    type: "input",
+    message: "What is the name of the department?"
+  })
+  .then(answer => {
+    return connection.query(
+      "INSERT INTO department SET ?",
+      {
+        name: answer.depName
+      },
+      err => {
+        if (err) {
+          throw err;
+        }
+        console.log("Department added successfully!");
+        return start();
+      }
+    );
+  });
 }
 
 function addRole() {
