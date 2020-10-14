@@ -241,11 +241,11 @@ function addRole() {
         {
           name: "salary",
           type: "input",
-          message: "What is role's salary?",
+          message: "What is the role's salary?",
           validate: value => (isNaN(value) ? "Enter a number." : true)
         },
         {
-          name: "departmentID",
+          name: "depId",
           type: "list",
           message: "Which department does this role belong to?",
           choices: depNames
@@ -257,14 +257,13 @@ function addRole() {
           {
             title: answer.roleTitle,
             salary: answer.salary,
-            department_id: answer.departmentID
+            department_id: answer.depId
           },
           err => {
             if (err) {
               throw err;
             }
-            console.log("Your role was added successfully!");
-            // re-prompt the user for their next action
+            console.log("Role added successfully!");
             return start();
           }
         );
@@ -273,5 +272,65 @@ function addRole() {
 }
 
 function updateEmpRole() {
+  connection.query("SELECT title, id FROM role", (err, roles) => {
+    if (err) {
+      throw err;
+    }
+    const roleNames = roles.map(row => {
+      return {
+        name: row.title,
+        value: row.id
+      };
+    });
 
+    connection.query(
+      "SELECT id, concat(first_name, ' ', last_name) AS name FROM employee",
+      (err, employees) => {
+        if (err) {
+          throw err;
+        }
+        const empNames = employees.map(row => {
+          return {
+            name: row.name,
+            value: row.id
+          };
+        });
+        return inquirer
+          .prompt([
+            {
+              name: "employeeId",
+              type: "list",
+              message: "Which employee would you like to update?",
+              choices: empNames
+            },
+            {
+              name: "roleId",
+              type: "list",
+              message: "What is the employee's new role?",
+              choices: roleNames
+            }
+          ])
+          .then(answer => {
+            return connection.query(
+              "UPDATE employee SET ? WHERE ?",
+              [
+                {
+                  role_id: answer.roleId
+                },
+                {
+                  id: answer.employeeId
+                }
+              ],
+              err => {
+                if (err) {
+                  throw err;
+                }
+                console.log("Employee role updated successfully!");
+                return start();
+              }
+            );
+          });
+      }
+    );
+  });
 }
