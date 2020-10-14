@@ -24,27 +24,27 @@ function start() {
       message: "What would you like to do?",
       choices: [
         "View All Employees",
-        "View All Employees By Department",
-        "View All Employees Manager",
+        "View All Departments",
+        "View All Roles",
 				"Add Employee",
-				"Remove Employee",
+				"Add Department",
+				"Add Role",
 				"Update Employee Role",
-				"Update Employee Manager",
 				"Exit"
       ]
     })
     .then(function (answer) {
       switch (answer.action) {
         case "View All Employees":
-          allEmp();
+          allEmps();
           break;
 
         case "View All Employees By Department":
-          allEmpByDep();
+          allDeps();
           break;
 
         case "View All Employees Manager":
-          allEmpManagers();
+          allRoles();
           break;
 
         case "Add Employee":
@@ -52,15 +52,15 @@ function start() {
 					break;
 					
         case "Remove Employee":
-          remEmp();
+          addDep();
           break;
 
         case "Update Employee Role":
-          updateEmpRole();
+          addRole();
 					break;
 					
         case "Update Employee Manager":
-          updateEmpManager();
+          updateEmpRole();
           break;
 
         case "Exit":
@@ -71,15 +71,15 @@ function start() {
 }
 
 
-function allEmp() {
+function allEmps() {
 
 }
 
-function allEmpByDep() {
+function allDeps() {
 
 }
 
-function allEmpManagers() {
+function allRoles() {
 
 }
 
@@ -87,14 +87,14 @@ function addEmp() {
 
 }
 
-function remEmp() {
+function addDep() {
+
+}
+
+function addRole() {
 
 }
 
 function updateEmpRole() {
-
-}
-
-function updateEmpManager() {
 
 }
