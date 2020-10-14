@@ -121,7 +121,79 @@ function allRoles() {
 }
 
 function addEmp() {
+  connection.query("SELECT title, id FROM role", (err, roles) => {
+    if (err) {
+      throw err;
+    }
+    const roleNames = roles.map(row => {
+      return {
+        name: row.title,
+        value: row.id
+      };
+    });
 
+    connection.query(
+      "SELECT id, concat(first_name, ' ', last_name) AS name FROM employee",
+      (err, employees) => {
+        if (err) {
+          throw err;
+        }
+        const managerNames = employees.map(nem => {
+          return {
+            name: nem.name,
+            value: nem.id
+          };
+        });
+        managerNames.unshift({
+          name: "No Manager",
+          value: null
+        });
+        return inquirer
+          .prompt([
+            {
+              name: "empFirst",
+              type: "input",
+              message: "What is the employee's first name?"
+            },
+            {
+              name: "empLast",
+              type: "input",
+              message: "What is the employee's last name?"
+            },
+            {
+              name: "roleId",
+              type: "list",
+              message: "What is the employee's role?",
+              choices: roleNames
+            },
+            {
+              name: "managerId",
+              type: "list",
+              message: "Who does this employee report to?",
+              choices: managerNames
+            }
+          ])
+          .then(answer => {
+            return connection.query(
+              "INSERT INTO employee SET ?",
+              {
+                first_name: answer.empFirst,
+                last_name: answer.empLast,
+                role_id: answer.roleId,
+                manager_id: answer.managerId
+              },
+              err => {
+                if (err) {
+                  throw err;
+                }
+                console.log("Employee added successfully!");
+                return start();
+              }
+            );
+          });
+      }
+    );
+  });
 }
 
 function addDep() {
