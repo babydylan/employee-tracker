@@ -12,7 +12,10 @@ const connection = mysql.createConnection({
   });
 
 	connection.connect(function (err) {
-		if (err) throw err;
+		if (err) {
+      throw err;
+    }
+    console.log("connected as id " + connection.threadId + "\n");
 		start();
 	});
 
@@ -91,7 +94,16 @@ return connection.query(
 }
 
 function allDeps() {
-
+  return connection.query(
+    "SELECT name FROM department",
+    (err, results) => {
+      if (err) {
+        throw err;
+      }
+      console.table(results);
+      return start();
+    }
+  );
 }
 
 function allRoles() {
