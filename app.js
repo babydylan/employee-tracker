@@ -4,20 +4,20 @@ require("console.table")
 
 
 const connection = mysql.createConnection({
-    host: "localhost",
-    port: 3306,
-    user: "root",
-    password: "password",
-    database: "employees_db"
-  });
+  host: "localhost",
+  port: 3306,
+  user: "root",
+  password: "password",
+  database: "employees_db"
+});
 
-	connection.connect(function (err) {
-		if (err) {
-      throw err;
-    }
-    console.log("connected as id " + connection.threadId + "\n");
-		start();
-	});
+connection.connect(function (err) {
+  if (err) {
+    throw err;
+  }
+  console.log("connected as id " + connection.threadId + "\n");
+  start();
+});
 
 function start() {
   inquirer
@@ -29,11 +29,11 @@ function start() {
         "View All Employees",
         "View All Departments",
         "View All Roles",
-				"Add Employee",
-				"Add Department",
-				"Add Role",
-				"Update Employee Role",
-				"Exit"
+        "Add Employee",
+        "Add Department",
+        "Add Role",
+        "Update Employee Role",
+        "Exit"
       ]
     })
     .then(function (answer) {
@@ -52,16 +52,16 @@ function start() {
 
         case "Add Employee":
           addEmp();
-					break;
-					
+          break;
+
         case "Add Department":
           addDep();
           break;
 
         case "Add Role":
           addRole();
-					break;
-					
+          break;
+
         case "Update Employee Role":
           updateEmpRole();
           break;
@@ -75,7 +75,7 @@ function start() {
 
 
 function allEmps() {
-return connection.query(
+  return connection.query(
     `SELECT employee.id, employee.first_name, employee.last_name, role.title, role.salary, department.name as department_name, 
     concat(managers.first_name, " ", managers.last_name) as manager
     FROM employee 
@@ -198,30 +198,78 @@ function addEmp() {
 
 function addDep() {
   return inquirer
-  .prompt({
-    name: "depName",
-    type: "input",
-    message: "What is the name of the department?"
-  })
-  .then(answer => {
-    return connection.query(
-      "INSERT INTO department SET ?",
-      {
-        name: answer.depName
-      },
-      err => {
-        if (err) {
-          throw err;
+    .prompt({
+      name: "depName",
+      type: "input",
+      message: "What is the name of the department?"
+    })
+    .then(answer => {
+      return connection.query(
+        "INSERT INTO department SET ?",
+        {
+          name: answer.depName
+        },
+        err => {
+          if (err) {
+            throw err;
+          }
+          console.log("Department added successfully!");
+          return start();
         }
-        console.log("Department added successfully!");
-        return start();
-      }
-    );
-  });
+      );
+    });
 }
 
 function addRole() {
-
+  return connection.query("SELECT * FROM department", (err, results) => {
+    if (err) {
+      throw err;
+    }
+    const depNames = results.map(row => {
+      return {
+        name: row.name,
+        value: row.id
+      };
+    });
+    return inquirer
+      .prompt([
+        {
+          name: "roleTitle",
+          type: "input",
+          message: "What is the name of the role?"
+        },
+        {
+          name: "salary",
+          type: "input",
+          message: "What is role's salary?",
+          validate: value => (isNaN(value) ? "Enter a number." : true)
+        },
+        {
+          name: "departmentID",
+          type: "list",
+          message: "Which department does this role belong to?",
+          choices: depNames
+        }
+      ])
+      .then(answer => {
+        return connection.query(
+          "INSERT INTO role SET ?",
+          {
+            title: answer.roleTitle,
+            salary: answer.salary,
+            department_id: answer.departmentID
+          },
+          err => {
+            if (err) {
+              throw err;
+            }
+            console.log("Your role was added successfully!");
+            // re-prompt the user for their next action
+            return start();
+          }
+        );
+      });
+  });
 }
 
 function updateEmpRole() {
