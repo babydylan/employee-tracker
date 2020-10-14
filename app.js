@@ -42,11 +42,11 @@ function start() {
           allEmps();
           break;
 
-        case "View All Employees By Department":
+        case "View All Departments":
           allDeps();
           break;
 
-        case "View All Employees Manager":
+        case "View All Roles":
           allRoles();
           break;
 
@@ -58,11 +58,11 @@ function start() {
           addDep();
           break;
 
-        case "Update Employee Role":
+        case "Add Role":
           addRole();
 					break;
 					
-        case "Update Employee Manager":
+        case "Update Employee Role":
           updateEmpRole();
           break;
 
@@ -107,7 +107,17 @@ function allDeps() {
 }
 
 function allRoles() {
-
+  return connection.query(
+    `SELECT role.title, role.salary, department.name as department_name 
+    FROM role JOIN department ON role.department_id = department.id`,
+    (err, results) => {
+      if (err) {
+        throw err;
+      }
+      console.table(results);
+      return start();
+    }
+  );
 }
 
 function addEmp() {
